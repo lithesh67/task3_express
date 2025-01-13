@@ -2,13 +2,13 @@ const authService=require('./auth_users.service');
 
 module.exports.loginUser=async(req,res,next)=>{
     try{
-        const {user,password}=req.body;
-        const result=await authService.login(user,password);
+        const {identifier,password}=req.body;
+        const result=await authService.login(identifier,password);
         if(result===null){
-            throw new Error("Invalid credentials");
+            return res.json({message:"Invalid credentials",bool:false});
         }
-        const {token,refresh}=result;
-        return res.json({message:"Login successful",bool:true,token,refresh});
+        const {token,refresh,username,email,id}=result;
+        return res.json({message:"Login successful",bool:true,token,refresh,username,email,id});
     }
     catch(err){
         next(err);
@@ -17,7 +17,7 @@ module.exports.loginUser=async(req,res,next)=>{
 }
 
 
-module.exports.register=async(req,res)=>{
+module.exports.register=async(req,res,next)=>{
     const {firstName,lastName,email,password}=req.body;
     try{
         if(await authService.userExists(email)===true){

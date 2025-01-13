@@ -23,7 +23,10 @@ module.exports=class authService{
             if(dbData && await bcrypt.compare(password,dbData.password)){
                 const token=signToken(dbData.id,dbData.username);
                 const refresh=signRefresh(dbData.id,dbData.username);
-                return {token,refresh};
+                const username=dbData.username;
+                const email=dbData.email;
+                const id=dbData.id;
+                return {token,refresh,username,email,id};
             }
             else{
                 return null;

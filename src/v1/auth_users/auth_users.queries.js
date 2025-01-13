@@ -14,9 +14,7 @@ module.exports=class authDB{
 
     static async login(user){
         try{
-            console.log(user);
-            
-            const dbData=await Users.query(knex).select('username','id','password').from('users').where('email','=',user).orWhere('username','=',user);
+            const dbData=await Users.query(knex).select('username','id','password','email').from('users').where('email','=',user).orWhere('username','=',user);
             return dbData[0];
         }
         catch(err){

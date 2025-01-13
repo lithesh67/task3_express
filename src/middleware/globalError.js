@@ -6,3 +6,4 @@ module.exports.globalError=(err,req,res,next)=>{
         bool:false
     });
 }
+ 
