@@ -1,7 +1,7 @@
 const express=require('express');
 const app=express();
 const env=require('dotenv').config();
-const {globalError}=require('./src/middleware/globalError');
+const {globalError}=require('./src/middleware/error_handlers/globalError');
 const cors=require('cors');
 const port=process.env.PORT;
 require('./src/mysql/db');

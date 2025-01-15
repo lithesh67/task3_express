@@ -1,5 +1,5 @@
 const jwt=require('jsonwebtoken');
-const { signToken } = require('../utils/signToken.utils');
+const { signToken } = require('../../utils/signToken.utils');
 
 function validateAndSend(refresh,req){
     try{
@@ -15,7 +15,8 @@ function validateAndSend(refresh,req){
 
 const validateToken=(req,res,next)=>{
     let token=req.headers.Authorization || req.headers.authorization;
-    const refresh=req.headers.refresh;    
+    const refresh=req.headers.refresh;  
+      
     if (token && token.startsWith("Bearer")){
         token=token.split(" ")[1];
         jwt.verify(token,process.env.SECRET_KEY_TOKEN,(err,decoded)=>{
@@ -28,7 +29,7 @@ const validateToken=(req,res,next)=>{
                 }
                 else{
                     console.log("Invalid refresh");
-                    return res.json({message:"Refresh token is aslo invalid",bool:false});
+                    return res.json({message:"Refresh token is also invalid",bool:false});
                 }
             }
             else if(err){

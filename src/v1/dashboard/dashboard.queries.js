@@ -7,7 +7,7 @@ module.exports=class dashboardQueries{
        try{
         const result=await Products.query(knex).select(
             ['pv.product_id','p.product_name','v.vendor_name','p.quantity_in_stock',
-            'c.category','p.measure',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
+            'c.category','p.measure','pv.created_at',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
             .from('products_to_vendors as pv')
             .leftJoin('products as p','p.product_id','pv.product_id')
             .leftJoin('categories as c','c.category_id','p.category_id')
