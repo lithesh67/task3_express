@@ -5,7 +5,7 @@ const {globalError}=require('./src/middleware/error_handlers/globalError');
 const cors=require('cors');
 const port=process.env.PORT;
 require('./src/mysql/db');
-app.use(cors({origin:"http://localhost:4200"}));
+app.use(cors({origin:"http://localhost:4200",exposedHeaders:['Authorization']}));
 app.use(express.json());
 
 

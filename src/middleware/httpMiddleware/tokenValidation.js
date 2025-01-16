@@ -24,7 +24,8 @@ const validateToken=(req,res,next)=>{
                 const newToken=validateAndSend(refresh,req);
                 if(newToken!=null){
                     console.log("new token generated");
-                    res.set("Authorization",newToken);
+                    res.setHeader("Authorization",newToken);
+                    // res.setHeader('Cache-Control', 'no-store');
                     next();
                 }
                 else{
