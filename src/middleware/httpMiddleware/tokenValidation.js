@@ -30,11 +30,11 @@ const validateToken=(req,res,next)=>{
                 }
                 else{
                     console.log("Invalid refresh");
-                    return res.json({message:"Refresh token is also invalid",bool:false});
+                    return res.status(401).json({message:"Refresh token is also invalid",bool:false});
                 }
             }
             else if(err){
-                return res.json({message:"Invalid token",bool:false});
+                return res.status(401).json({message:"Invalid token",bool:false});
             }
             else{
                 req.userid=decoded.id;

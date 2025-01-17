@@ -1,5 +1,6 @@
 const Users=require('../../models/Users.model');
 const Files=require('../../models/Files.models');
+const Products=require('../../models/Products.model');
 const knex=require('../../mysql/db');
 
 module.exports=class fileQueries{
@@ -30,4 +31,14 @@ module.exports=class fileQueries{
         throw err;
       }
     }
-}
+
+    static async productImage(url,product_id){
+      try{
+        return await Products.query(knex).update({product_image:url}).where('product_id','=',product_id);
+      }
+      catch(err){
+        throw err;
+      }
+    }
+
+  }

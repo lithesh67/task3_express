@@ -36,3 +36,14 @@ module.exports.uploadFile=async(req,res,next)=>{
         next(err);
     }
 }
+
+module.exports.productImage=async(req,res,next)=>{
+    try{
+        const {url,product_id}=req.body;
+        const result=await fileService.productImage(url,product_id);
+        res.json({message:"stored the product image",bool:true});
+    }
+    catch(err){
+       next(err);
+    }
+}

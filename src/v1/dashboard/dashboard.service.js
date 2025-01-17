@@ -40,9 +40,18 @@ module.exports=class dashboardService{
         }
     }
 
-    static async addProduct(productName,vendor,category,quantity,measure,price){
+    static async addProduct(productName,vendor_id,category_id,quantity,measure,price){
         try{
-           return dashboardQueries.addProduct(productName,vendor,category,quantity,measure,price);
+           return dashboardQueries.addProduct(productName,vendor_id,category_id,quantity,measure,price);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async deleteProduct(product_id,vendor_id){
+        try{
+            await dashboardQueries.deleteProduct(product_id,vendor_id);
         }
         catch(err){
             throw err;

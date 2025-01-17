@@ -30,5 +30,14 @@ module.exports=class fileService{
         }
     }
 
+    static async productImage(url,product_id){
+        try{
+            return await fileQueries.productImage(url,product_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
 }
 

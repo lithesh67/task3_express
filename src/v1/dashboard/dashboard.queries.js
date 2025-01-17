@@ -15,8 +15,8 @@ module.exports=class dashboardQueries{
         const count=await ProductsVendors.query(knex).countDistinct('product_id as count');
         const result=await Products.query(knex).select(
             ['pv.product_id','p.product_name','v.vendor_name','p.quantity_in_stock',
-            'c.category','p.measure','pv.created_at',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
-            .from('products_to_vendors as pv')
+            'c.category','p.measure','pv.created_at','p.product_image','pv.vendor_id',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
+            .from('products_to_vendors as pv').where('p.status','!=','99')
             .leftJoin('products as p','p.product_id','pv.product_id')
             .leftJoin('categories as c','c.category_id','p.category_id')
             .leftJoin('vendors as v','v.vendor_id','pv.vendor_id')
@@ -51,8 +51,8 @@ module.exports=class dashboardQueries{
 
     static async getCategories_vendors(){
         try{
-            const categories=await Categories.query(knex).select(['category']);
-            const vendors=await Vendors.query(knex).select(['vendor_name']);
+            const categories=await Categories.query(knex).select(['category','category_id']);
+            const vendors=await Vendors.query(knex).select(['vendor_name','vendor_id']);
             return {categories,vendors};
         }
         catch(err){
@@ -60,22 +60,19 @@ module.exports=class dashboardQueries{
         }
     }
 
-    static async addProduct(productName,vendor,category,quantity,measure,price){
+    static async addProduct(productName,vendor_id,category_id,quantity,measure,price){
         const trx=await knex.transaction();
         try{
-            const categoryIdObj=await Categories.query(trx).select(['category_id']).where('category','=',category);
-            const vendorIdObj=await Vendors.query(trx).select(['vendor_id']).where('vendor_name','=',vendor);
-            
             const insertedProduct=await Products.query(trx).insert({
                 product_name:productName,
-                category_id:categoryIdObj[0].category_id,
+                category_id:category_id,
                 quantity_in_stock:quantity,
                 measure:measure,
                 unit_price: price
             });
             
             const result2=await Products_To_Vendors.query(trx).insert({
-                vendor_id:vendorIdObj[0].vendor_id,
+                vendor_id:vendor_id,
                 product_id:insertedProduct.product_id
             });
             trx.commit();
@@ -83,6 +80,18 @@ module.exports=class dashboardQueries{
         }
         catch(err){
             trx.rollback();
+            throw err;
+        }
+    }
+
+    static async deleteProduct(product_id,vendor_id){
+        const trx=await knex.transaction();
+        try{
+            await Products.query(knex).update({status:'99'}).where('product_id','=',product_id);
+            await Products_To_Vendors.query(knex).update({status:'99'}).where('product_id','=',product_id)
+                                     .where('vendor_id','=',vendor_id);
+        }
+        catch(err){
             throw err;
         }
     }
