@@ -12,10 +12,10 @@ module.exports=class dashboardQueries{
 
     static async getProducts(offset,limit){
        try{
-        const count=await ProductsVendors.query(knex).countDistinct('product_id as count');
+        const count=await ProductsVendors.query(knex).countDistinct('product_id as count').where('status','!=','99');
         const result=await Products.query(knex).select(
-            ['pv.product_id','p.product_name','v.vendor_name','p.quantity_in_stock',
-            'c.category','p.measure','pv.created_at','p.product_image','pv.vendor_id',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
+            ['pv.product_id','p.product_name','p.quantity_in_stock',
+            'c.category','p.measure','pv.created_at','p.product_image',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
             .from('products_to_vendors as pv').where('p.status','!=','99')
             .leftJoin('products as p','p.product_id','pv.product_id')
             .leftJoin('categories as c','c.category_id','p.category_id')
@@ -84,12 +84,48 @@ module.exports=class dashboardQueries{
         }
     }
 
-    static async deleteProduct(product_id,vendor_id){
+    static async deleteProduct(product_id){
         const trx=await knex.transaction();
         try{
-            await Products.query(knex).update({status:'99'}).where('product_id','=',product_id);
-            await Products_To_Vendors.query(knex).update({status:'99'}).where('product_id','=',product_id)
-                                     .where('vendor_id','=',vendor_id);
+            await Products.query(knex).patch({status:'99'}).where('product_id','=',product_id);
+            await Products_To_Vendors.query(knex).patch({status:'99'}).where('product_id','=',product_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async updateQuantity(tempCartArray){
+       const trx=await knex.transaction();
+       try{
+          for(let i=0;i<tempCartArray.length;i++){
+            console.log(tempCartArray[i]);
+            let addthis=tempCartArray[i].selectedQuantity;
+            let product_id=tempCartArray[i].product_id;
+            let existingQuantity=tempCartArray[i].quantity_in_stock;
+            await Products.query(trx).patch({
+                quantity_in_stock:  existingQuantity+addthis
+                }).where('product_id','=',product_id);
+          }
+          trx.commit();
+       }
+       catch(err){
+        trx.rollback();
+        throw err;
+       }
+    }
+
+    static async fetchAll(){
+        try{
+            const result=await Products.query(knex).select(
+                ['pv.product_id','p.product_name','p.quantity_in_stock',
+                'c.category','p.measure','pv.created_at','p.product_image',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
+                .from('products_to_vendors as pv').where('p.status','!=','99')
+                .leftJoin('products as p','p.product_id','pv.product_id')
+                .leftJoin('categories as c','c.category_id','p.category_id')
+                .leftJoin('vendors as v','v.vendor_id','pv.vendor_id')
+                .groupBy('pv.product_id');
+            return  result
         }
         catch(err){
             throw err;

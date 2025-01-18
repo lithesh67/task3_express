@@ -25,11 +25,10 @@ module.exports=class authDB{
     static async insertUser(obj){
         const trx=await knex.transaction();
         try{
-
             const inserted=await Users.query(trx).insert(obj);
             const username=obj.first_name+inserted.id;
             console.log(username);
-            await Users.query(trx).where('id','=',inserted.id).update({username:username});
+            await Users.query(trx).where('id','=',inserted.id).patch({username:username});
             await trx.commit();
             return username; 
         }

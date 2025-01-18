@@ -49,9 +49,27 @@ module.exports=class dashboardService{
         }
     }
 
-    static async deleteProduct(product_id,vendor_id){
+    static async deleteProduct(product_id){
         try{
-            await dashboardQueries.deleteProduct(product_id,vendor_id);
+            await dashboardQueries.deleteProduct(product_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async updateQuantity(tempCartArray){
+        try{
+            await dashboardQueries.updateQuantity(tempCartArray);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async fetchAll(){
+        try{
+            return dashboardQueries.fetchAll();
         }
         catch(err){
             throw err;

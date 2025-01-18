@@ -1,8 +1,16 @@
 const authService=require('./auth_users.service');
+const { loginUserSchema, registerSchema } = require('./dto/auth_users.joi');
 
 module.exports.loginUser=async(req,res,next)=>{
+    const {identifier,password}=req.body;
+    const {error}=loginUserSchema.validate({
+        identifier,
+        password
+    });
+    if(error){
+        return res.status(400).json({message: error.details[0].message});
+    }
     try{
-        const {identifier,password}=req.body;
         const result=await authService.login(identifier,password);
         if(result===null){
             return res.status(401).json({message:"Invalid credentials",bool:false});
@@ -18,10 +26,16 @@ module.exports.loginUser=async(req,res,next)=>{
 
 
 module.exports.register=async(req,res,next)=>{
+    const {firstName,lastName,email,password}=req.body;
+    const {error}=registerSchema.validate({
+        firstName,lastName,email,password
+    });
+    if(error){
+        return res.status(400).json({message: error.details[0].message});
+    }
     try{
-        const {firstName,lastName,email,password}=req.body;
         if(await authService.userExists(email)===true){
-           return res.status(204).json({message:"user already exists",bool:false});
+           return res.json({message:"user already exists",bool:false});
         }
         const username=await authService.register(firstName,lastName,email,password);
         return res.status(201).json({message:"User created successfully",bool:true,username});

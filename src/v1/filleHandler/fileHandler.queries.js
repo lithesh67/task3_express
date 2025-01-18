@@ -7,7 +7,8 @@ module.exports=class fileQueries{
 
     static async updateProfile(profile_url,user_id){
        try{
-          const result=await Users.query(knex).update({'profile_pic':profile_url}).where('id','=',user_id);
+          const result=await Users.query(knex).patch({'profile_pic':profile_url}).where('id','=',user_id);
+          // const result=await Users.query(knex).update({'profile_pic':profile_url}).where('id','=',user_id);
           return result;
         }
        catch(err){
@@ -34,7 +35,7 @@ module.exports=class fileQueries{
 
     static async productImage(url,product_id){
       try{
-        return await Products.query(knex).update({product_image:url}).where('product_id','=',product_id);
+        return await Products.query(knex).patch({product_image:url}).where('product_id','=',product_id);
       }
       catch(err){
         throw err;
