@@ -76,4 +76,13 @@ module.exports=class dashboardService{
         }
     }
 
+    static async onSearch(text,pageSize,current_page,filterCols){
+        try{
+            return await dashboardQueries.onSearch(text,pageSize,current_page,filterCols);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
 }

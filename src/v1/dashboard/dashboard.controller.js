@@ -119,3 +119,20 @@ module.exports.fetchAll=async(req,res,next)=>{
         next(err);
     }
 }
+
+module.exports.onSearch=async(req,res,next)=>{
+    try{
+        const text=req.query.text;
+        const pageSize=req.query.pageSize;
+        const current_page=req.query.current_page;
+        let filterCols=req.query.filterCols;
+        if(!Array.isArray(filterCols)){
+           filterCols=[filterCols];
+        }
+        const result=await dashboardService.onSearch(text,pageSize,current_page,filterCols);
+        res.status(200).json({tableData:result});
+    }
+    catch(err){
+        next(err);
+    }
+}

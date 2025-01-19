@@ -125,8 +125,28 @@ module.exports=class dashboardQueries{
                 .leftJoin('categories as c','c.category_id','p.category_id')
                 .leftJoin('vendors as v','v.vendor_id','pv.vendor_id')
                 .groupBy('pv.product_id');
-            return  result
+            return  result;
         }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async onSearch(text,pageSize,current_page,filterCols){
+        try{
+            const concatColumns = filterCols.join(", ' ', ");
+            
+            const result=await Products.query(knex).select(
+                ['pv.product_id','p.product_name','p.quantity_in_stock',
+                'c.category','p.measure','pv.created_at','p.product_image',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
+                .from('products_to_vendors as pv').where('p.status','!=','99')
+                .leftJoin('products as p','p.product_id','pv.product_id')
+                .leftJoin('categories as c','c.category_id','p.category_id')
+                .leftJoin('vendors as v','v.vendor_id','pv.vendor_id')
+                .groupBy('pv.product_id').whereRaw(`CONCAT(${concatColumns}) LIKE ?`,[`%${text}`])
+                .offset((current_page-1)*pageSize).limit(pageSize);
+            return result;
+        } 
         catch(err){
             throw err;
         }
