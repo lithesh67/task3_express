@@ -1,3 +1,4 @@
+const { response } = require("express");
 const dashboardService = require("./dashboard.service");
 const { getProductsSchema, getFilesSchema, userDetailsSchema, deleteProductSchema, addProductSchema } = require("./dto/dashboard.joi");
 
@@ -131,6 +132,31 @@ module.exports.onSearch=async(req,res,next)=>{
         }
         const result=await dashboardService.onSearch(text,pageSize,current_page,filterCols);
         res.status(200).json({tableData:result});
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+
+module.exports.addNewData=async(req,res,next)=>{
+    try{
+       const {newData}=req.body;
+       await dashboardService.addNewData(newData);
+       res.status(201).json({message:"Inserted successfully"});
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+module.exports.editProduct=async(req,res,next)=>{
+    try{
+       const {obj,vendorArray,product_id}=req.body;
+       console.log(obj,vendorArray,product_id);
+       await dashboardService.editProduct(obj,vendorArray,product_id);
+       res.status(201).json({message:"updated successfully"});
+       
     }
     catch(err){
         next(err);

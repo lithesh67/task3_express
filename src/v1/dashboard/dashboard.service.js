@@ -85,4 +85,22 @@ module.exports=class dashboardService{
         }
     }
 
+    static async addNewData(newData){
+        try{
+            return await dashboardQueries.addNewData(newData);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async editProduct(obj,vendorArray,product_id){
+        try{
+            await dashboardQueries.editProduct(obj,vendorArray,product_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
 }

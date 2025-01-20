@@ -14,7 +14,7 @@ module.exports=class dashboardQueries{
        try{
         const count=await ProductsVendors.query(knex).countDistinct('product_id as count').where('status','!=','99');
         const result=await Products.query(knex).select(
-            ['pv.product_id','p.product_name','p.quantity_in_stock',
+            ['pv.product_id','p.product_name','p.quantity_in_stock','p.unit_price','p.category_id',
             'c.category','p.measure','pv.created_at','p.product_image',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
             .from('products_to_vendors as pv').where('p.status','!=','99')
             .leftJoin('products as p','p.product_id','pv.product_id')
@@ -148,6 +148,54 @@ module.exports=class dashboardQueries{
             return result;
         } 
         catch(err){
+            throw err;
+        }
+    }
+
+    static async addNewData(newData){
+        const trx=await knex.transaction();
+        try{
+           for (let product of newData){
+             const inserted=await Products.query(trx).insert({
+                product_name:product.product_name,
+                category_id:product.category_id,
+                quantity_in_stock:product.quantity_in_stock,
+                unit_price:product.unit_price,
+                measure:product.measure
+             });
+             await Products_To_Vendors.query(trx).insert({
+                product_id:inserted.product_id,
+                vendor_id:product.vendor_id
+             });
+           }
+           trx.commit();
+        }
+        catch(err){
+            trx.rollback();
+            throw err;
+        }
+    }
+
+    static async editProduct(obj,vendorArray,product_id){
+        const trx=await knex.transaction();
+        try{
+          await Products.query(trx).patch({
+            product_name:obj.productName,
+            category_id:obj.category_id,
+            quantity_in_stock:obj.quantity,
+            measure: obj.measure,
+            unit_price:obj.price
+          });
+          for(let i=0;i<vendorArray.length;i++){
+            const exists=await Products_To_Vendors.query(trx).select('vendor_id').where('product_id','=',product_id).where('vendor_id','=',vendorArray[i]);
+            if(exists.length==0){
+                await Products_To_Vendors.query(trx).patch({product_id:product_id,vendor_id:vendorArray[i]});
+            }
+          }
+          trx.commit();
+        }
+        catch(err){
+            trx.rollback();
             throw err;
         }
     }
