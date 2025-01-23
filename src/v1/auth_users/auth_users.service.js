@@ -23,6 +23,7 @@ module.exports=class authService{
             if(dbData && await bcrypt.compare(password,dbData.password)){
                 const token=signToken(dbData.id,dbData.username);
                 const refresh=signRefresh(dbData.id,dbData.username);
+                await authDB.storeRefresh(user,refresh);
                 const username=dbData.username;
                 const email=dbData.email;
                 const id=dbData.id;
@@ -45,6 +46,15 @@ module.exports=class authService{
            const username=await authDB.insertUser(obj);
            return username;
 
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async getRefresh(userid){
+        try{
+            return await authDB.getRefresh(userid);
         }
         catch(err){
             throw err;

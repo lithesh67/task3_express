@@ -185,11 +185,11 @@ module.exports=class dashboardQueries{
             quantity_in_stock:obj.quantity,
             measure: obj.measure,
             unit_price:obj.price
-          });
+          }).where('product_id','=',product_id);
           for(let i=0;i<vendorArray.length;i++){
             const exists=await Products_To_Vendors.query(trx).select('vendor_id').where('product_id','=',product_id).where('vendor_id','=',vendorArray[i]);
             if(exists.length==0){
-                await Products_To_Vendors.query(trx).patch({product_id:product_id,vendor_id:vendorArray[i]});
+                await Products_To_Vendors.query(trx).insert({product_id:product_id,vendor_id:vendorArray[i]});
             }
           }
           trx.commit();

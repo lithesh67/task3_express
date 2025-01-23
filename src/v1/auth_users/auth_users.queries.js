@@ -38,4 +38,23 @@ module.exports=class authDB{
         }
     }
 
+    static async storeRefresh(user,refresh){
+        try{
+            await Users.query(knex).patch({refresh_token:refresh}).where('email','=',user).orWhere('username','=',user);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async getRefresh(userid){
+        try{
+            const result=await Users.query(knex).select(['refresh_token']).from('users').where('id','=',userid);
+            return result[0].refresh_token;
+        }
+        catch(err){
+            return null;
+        }
+    }
+
 }

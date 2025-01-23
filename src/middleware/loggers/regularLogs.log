@@ -1,0 +1,21 @@
+undefined
+undefined
+undefined
+{"level":"\u001b[31merror\u001b[39m","message":"testing","stack":"Error: testing\n    at module.exports.loginUser (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.controller.js:19:15)","timestamp":"2025-01-22T11:09:04.661Z"}
+{"level":"\u001b[31merror\u001b[39m","message":"testing","method":"POST","status":500,"timestamp":"2025-01-22T11:12:05.026Z","url":"/api/login"}
+undefined
+2025-01-22T11:14:53.003Z [31merror[39m: testing
+2025-01-22T11:16:55.618Z [31merror[39m: testing
+2025-01-22T11:23:32.641Z [31merror[39m: testing
+2025-01-22T11:31:05.419Z [31merror[39m: testing
+{"level":"error","message":"testing","method":"POST","stack":"Error: testing\n    at module.exports.loginUser (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.controller.js:19:15)","status":500,"url":"/api/login"}
+{"level":"error","message":"testing","method":"POST","stack":"Error: testing\n    at module.exports.loginUser (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.controller.js:19:15)","status":500,"url":"/api/login"}
+{"level":"info","message":"User logged in"}
+{"level":"info","message":"User logged in"}
+{"level":"error","message":"dashboardQueries.storeRefresh is not a function","method":"POST","stack":"TypeError: dashboardQueries.storeRefresh is not a function\n    at Function.login (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.service.js:27:40)\n    at async module.exports.loginUser (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.controller.js:15:22)","status":500,"url":"/api/login"}
+{"level":"error","message":"dashboardQueries.storeRefresh is not a function","method":"POST","stack":"TypeError: dashboardQueries.storeRefresh is not a function\n    at Function.login (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.service.js:27:40)\n    at async module.exports.loginUser (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\auth_users\\auth_users.controller.js:15:22)","status":500,"url":"/api/login"}
+{"level":"info","message":"User logged in"}
+{"level":"info","message":"User logged in"}
+{"level":"info","message":"User logged in"}
+{"level":"info","message":"User logged in"}
+{"level":"info","message":"User logged in"}

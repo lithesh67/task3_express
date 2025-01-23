@@ -1,3 +1,5 @@
+const { ref } = require('joi');
+const { logger } = require('../../middleware/loggers/logger');
 const authService=require('./auth_users.service');
 const { loginUserSchema, registerSchema } = require('./dto/auth_users.joi');
 
@@ -16,6 +18,7 @@ module.exports.loginUser=async(req,res,next)=>{
             return res.status(401).json({message:"Invalid credentials",bool:false});
         }
         const {token,refresh,username,email,id}=result;
+        logger.info({message:"User logged in"})
         return res.status(200).json({message:"Login successful",bool:true,token,refresh,username,email,id});
     }
     catch(err){
@@ -39,6 +42,16 @@ module.exports.register=async(req,res,next)=>{
         }
         const username=await authService.register(firstName,lastName,email,password);
         return res.status(201).json({message:"User created successfully",bool:true,username});
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+module.exports.getRefresh=async(userid)=>{
+    try{
+       const refresh=await authService.getRefresh(userid);
+       return refresh;
     }
     catch(err){
         next(err);
