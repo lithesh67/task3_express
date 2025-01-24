@@ -42,4 +42,13 @@ module.exports=class fileQueries{
       }
     }
 
+    static async storeThumbnail(url,user_id){
+      try{
+        return await Users.query(knex).patch({'thumbnail':url}).where('id','=',user_id);
+      }
+      catch(err){
+        throw err;
+      }
+    }
+
   }

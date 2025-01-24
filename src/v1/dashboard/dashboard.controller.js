@@ -47,8 +47,9 @@ module.exports.userDetails=async(req,res,next)=>{
         return res.status(400).json({message: error.details[0].message}); 
     }
     try{
-        const result=await dashboardService.userDetails(userid);
-        res.status(200).json({profile_pic:result[0].profile_pic});
+        let result=await dashboardService.userDetails(userid);
+        result=process.env.aws_domain+result[0].thumbnail;
+        res.status(200).json({profile_pic:result});
         
     }
     catch(err){

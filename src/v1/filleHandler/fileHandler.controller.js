@@ -1,3 +1,4 @@
+const { s3 } = require("../../aws/s3/s3Files");
 const { uploadImageSchema, getUrlSchema, uploadFileSchema, productImageSchema } = require("./dto/fileHandler.joi");
 const fileService = require("./fileHandler.service");
 
@@ -13,6 +14,13 @@ module.exports.uploadImage=async(req,res,next)=>{
     }
     try{
        const result=await fileService.updateProfile(profile_url,user_id);
+       const key_of_url=profile_url.split('.com/')[1];
+       const params={
+        Bucket:process.env.aws_BUCKET_NAME,
+        Key:key_of_url,
+       }
+       const file=await s3.getObject(params).promise();
+       await fileService.compressImage(file,key_of_url,user_id);
        res.status(200).json({message:"Updated profile picture",bool:true});
     }
     catch(err){

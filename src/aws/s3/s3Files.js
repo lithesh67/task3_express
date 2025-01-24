@@ -17,6 +17,6 @@ const getPreSignedUrl=async(bucketName,fileKey,fileType)=>{
     return s3.getSignedUrlPromise("putObject",params);
 }
 
-module.exports={getPreSignedUrl};
+module.exports={getPreSignedUrl,s3};
 
 

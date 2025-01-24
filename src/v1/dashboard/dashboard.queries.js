@@ -42,7 +42,7 @@ module.exports=class dashboardQueries{
 
     static async userDetails(userid){
         try{
-            return await Users.query(knex).select(['profile_pic']).where('id','=',userid);
+            return await Users.query(knex).select(['thumbnail']).where('id','=',userid);
         }
         catch(err){
             throw err;
@@ -87,8 +87,8 @@ module.exports=class dashboardQueries{
     static async deleteProduct(product_id){
         const trx=await knex.transaction();
         try{
-            await Products.query(knex).patch({status:'99'}).where('product_id','=',product_id);
-            await Products_To_Vendors.query(knex).patch({status:'99'}).where('product_id','=',product_id);
+            await Products.query(trx).patch({status:'99'}).where('product_id','=',product_id);
+            await Products_To_Vendors.query(trx).patch({status:'99'}).where('product_id','=',product_id);
         }
         catch(err){
             throw err;
@@ -108,6 +108,7 @@ module.exports=class dashboardQueries{
                 }).where('product_id','=',product_id);
           }
           trx.commit();
+          return;
        }
        catch(err){
         trx.rollback();

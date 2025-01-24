@@ -1,4 +1,5 @@
-const { getPreSignedUrl } = require("../../aws/s3/s3Files");
+const { getPreSignedUrl, s3 } = require("../../aws/s3/s3Files");
+const sharp=require('sharp');
 const fileQueries = require("./fileHandler.queries");
 
 module.exports=class fileService{
@@ -37,6 +38,24 @@ module.exports=class fileService{
         catch(err){
             throw err;
         }
+    }
+
+    static async compressImage(file,key_of_url,user_id){
+        try{
+            const compressedImage=await sharp(file.Body).resize(60,60,{fit:'contain',position:'center'}).toBuffer();
+            const params={
+              Bucket:process.env.aws_BUCKET_NAME,
+              Key:key_of_url+'/thumbnail',
+              ContentType:file.ContentType,
+              Body:file.Body
+            }
+            await s3.putObject(params).promise();
+            await fileQueries.storeThumbnail(key_of_url+'/thumbnail',user_id);
+        }
+        catch(err){
+            throw err;
+        }
+       
     }
 
 }
