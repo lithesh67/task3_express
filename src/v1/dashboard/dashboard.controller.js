@@ -131,8 +131,8 @@ module.exports.onSearch=async(req,res,next)=>{
         if(!Array.isArray(filterCols)){
            filterCols=[filterCols];
         }
-        const result=await dashboardService.onSearch(text,pageSize,current_page,filterCols);
-        res.status(200).json({tableData:result});
+        const {result,count}=await dashboardService.onSearch(text,pageSize,current_page,filterCols);
+        res.status(200).json({tableData:result,count:count});
     }
     catch(err){
         next(err);

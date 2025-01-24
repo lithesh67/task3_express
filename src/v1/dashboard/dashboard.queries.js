@@ -137,16 +137,22 @@ module.exports=class dashboardQueries{
         try{
             const concatColumns = filterCols.join(", ' ', ");
             
-            const result=await Products.query(knex).select(
+            const query=Products.query(knex).select(
                 ['pv.product_id','p.product_name','p.quantity_in_stock',
                 'c.category','p.measure','pv.created_at','p.product_image',knex.raw('GROUP_CONCAT(v.vendor_name) as vendors')])
                 .from('products_to_vendors as pv').where('p.status','!=','99')
                 .leftJoin('products as p','p.product_id','pv.product_id')
                 .leftJoin('categories as c','c.category_id','p.category_id')
                 .leftJoin('vendors as v','v.vendor_id','pv.vendor_id')
-                .groupBy('pv.product_id').whereRaw(`CONCAT(${concatColumns}) LIKE ?`,[`%${text}`])
-                .offset((current_page-1)*pageSize).limit(pageSize);
-            return result;
+                .groupBy('pv.product_id').where(function(){
+                    for(const column of filterCols){
+                      this.orWhereRaw(`LOWER(TRIM(${column})) LIKE '%${text.trim().toLowerCase()}%'`);
+                    }
+                })
+            const count=await query.resultSize();
+            const result=await query.offset((current_page-1)*pageSize).limit(pageSize);
+            
+            return {result,count};
         } 
         catch(err){
             throw err;

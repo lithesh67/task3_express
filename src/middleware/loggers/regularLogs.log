@@ -77,3 +77,6 @@ undefined
 {"level":"\u001b[31merror\u001b[39m","message":"user_id is not defined","method":"POST","stack":"ReferenceError: user_id is not defined\n    at Function.storeThumbnail (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\filleHandler\\fileHandler.queries.js:47:80)\n    at Function.compressImage (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\filleHandler\\fileHandler.service.js:53:31)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)\n    at async module.exports.uploadImage (C:\\Users\\Akrivia\\Desktop\\Task3_express\\src\\v1\\filleHandler\\fileHandler.controller.js:25:8)","status":500,"url":"/api/updateProfile"}
 {"level":"\u001b[32minfo\u001b[39m","message":"User logged in"}
 {"level":"\u001b[32minfo\u001b[39m","message":"User logged in"}
+{"level":"\u001b[32minfo\u001b[39m","message":"User logged in"}
+{"level":"\u001b[32minfo\u001b[39m","message":"User logged in"}
+{"level":"\u001b[32minfo\u001b[39m","message":"User logged in"}
