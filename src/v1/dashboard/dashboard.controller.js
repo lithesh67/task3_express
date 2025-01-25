@@ -163,3 +163,14 @@ module.exports.editProduct=async(req,res,next)=>{
         next(err);
     }
 }
+
+module.exports.removeFromCart=async(req,res,next)=>{
+    try{
+       const {product_id,selectedQuantity,stock}=req.body;
+       await dashboardService.removeFromCart(product_id,selectedQuantity,stock);
+       res.status(200).json({message:"Item removed",bool:true}); 
+    }
+    catch(err){
+        next(err);
+    }
+}

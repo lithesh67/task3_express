@@ -103,4 +103,13 @@ module.exports=class dashboardService{
         }
     }
 
+    static async removeFromCart(product_id,selectedQuantity,stock){
+        try{
+            await dashboardQueries.removeFromCart(product_id,selectedQuantity,stock);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
 }

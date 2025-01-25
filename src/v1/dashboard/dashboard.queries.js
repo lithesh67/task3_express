@@ -206,6 +206,17 @@ module.exports=class dashboardQueries{
             throw err;
         }
     }
+
+    static async removeFromCart(product_id,selectedQuantity,stock){
+        try{
+           await Products.query(knex).patch({
+             quantity_in_stock:stock-selectedQuantity
+           }).where('product_id','=',product_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
 }
 
 // select pv.product_id, p.product_name,pv.vendor_id,sum(p.quantity_in_stock),p.unit_price,c.category,v.vendor_name,GROUP_CONCAT(v.vendor_name ORDER BY v.vendor_name) AS vendor_names

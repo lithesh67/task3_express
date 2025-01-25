@@ -1,5 +1,5 @@
 const express=require('express');
-const { getProducts, getFiles, userDetails, getCategories_vendors, addProduct, deleteProduct, updateQuantity, fetchAll, onSearch, addNewData, editProduct } = require('./dashboard.controller');
+const { getProducts, getFiles, userDetails, getCategories_vendors, addProduct, deleteProduct, updateQuantity, fetchAll, onSearch, addNewData, editProduct, removeFromCart } = require('./dashboard.controller');
 const { validateToken } = require('../../middleware/httpMiddleware/tokenValidation');
 const router=express.Router();
 
@@ -14,5 +14,6 @@ router.route('/fetchAll').get(validateToken,fetchAll);
 router.route('/search').get(validateToken,onSearch);
 router.route('/importData').post(validateToken,addNewData);
 router.route('/editProduct').post(validateToken,editProduct);
+router.route('/removeFromCart').patch(validateToken,removeFromCart);
 
 module.exports=router;
