@@ -2,6 +2,7 @@ const { ref } = require('joi');
 const { logger } = require('../../middleware/loggers/logger');
 const authService=require('./auth_users.service');
 const { loginUserSchema, registerSchema } = require('./dto/auth_users.joi');
+const { signToken } = require('../../utils/signToken.utils');
 
 module.exports.loginUser=async(req,res,next)=>{
     const {identifier,password}=req.body;
@@ -52,6 +53,32 @@ module.exports.getRefresh=async(userid)=>{
     try{
        const refresh=await authService.getRefresh(userid);
        return refresh;
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+module.exports.forgotPassowrd=async(req,res,next)=>{
+    try{
+       const {email}=req.body; 
+       const userExists=await authService.userExists(email);
+       if(!userExists){
+          return res.status(404).json({message:"Email is not registered"});
+       }
+       await authService.sendEmail(email);
+       return res.status(200).json({message:"Email sent successfully"});
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+module.exports.resetPassword=async(req,res,next)=>{
+    try{
+       const {password,token}=req.body;
+       await authService.resetPassword(password,token);
+       return res.status(200).json({message:"Password reset successfully"});
     }
     catch(err){
         next(err);

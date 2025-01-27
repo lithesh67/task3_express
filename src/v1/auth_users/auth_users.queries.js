@@ -57,4 +57,13 @@ module.exports=class authDB{
         }
     }
 
+    static async resetPassword(email,hashed_password){
+        try{
+           await Users.query(knex).patch({password:hashed_password}).where('email','=',email);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
 }
