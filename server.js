@@ -4,11 +4,15 @@ const env=require('dotenv').config();
 const {globalError}=require('./src/middleware/error_handlers/globalError');
 const cors=require('cors');
 const port=process.env.PORT;
+const swaggerUi=require('swagger-ui-express');
+
 require('./src/mysql/db');
 app.use(cors({origin:"http://localhost:4200",exposedHeaders:['Authorization']}));
 app.use(express.json());
 
+const swaggerSpec=require('./src/utils/swagger_specs');
 
+app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec));
 app.use('/api',require('./src/v1/v1Routes'));
 
 app.use(globalError);

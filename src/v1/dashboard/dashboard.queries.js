@@ -163,16 +163,20 @@ module.exports=class dashboardQueries{
         const trx=await knex.transaction();
         try{
            for (let product of newData){
+             console.log(product);
+             
+             const category=await Categories.query(trx).select(['category_id']).where('category','=',product.category);
+             const vendor=await Vendors.query(trx).select(['vendor_id']).where('vendor_name','=',product.vendor_name);
              const inserted=await Products.query(trx).insert({
                 product_name:product.product_name,
-                category_id:product.category_id,
+                category_id:category[0].category_id,
                 quantity_in_stock:product.quantity_in_stock,
                 unit_price:product.unit_price,
                 measure:product.measure
              });
              await Products_To_Vendors.query(trx).insert({
                 product_id:inserted.product_id,
-                vendor_id:product.vendor_id
+                vendor_id:vendor[0].vendor_id
              });
            }
            trx.commit();
