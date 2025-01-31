@@ -32,7 +32,7 @@ module.exports=class dashboardQueries{
     static async getFiles(userid){
         try{
             const result= await Files.query(knex).select(['file_name','file_type','file_size','file_path'])
-                          .where('user_id','=',userid);
+                          .where('user_id','=',userid).where('purpose','=','0');
             return result;
         }
         catch(err){

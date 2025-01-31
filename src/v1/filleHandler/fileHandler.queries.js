@@ -16,7 +16,7 @@ module.exports=class fileQueries{
        }
     }
 
-    static async uploadFile(fileName,url,fileType,fileSize,userid){
+    static async uploadFile(fileName,url,fileType,fileSize,userid,purpose){
       try{
         const result=await Files.query(knex).insert({
           file_name:fileName,
@@ -24,7 +24,8 @@ module.exports=class fileQueries{
           file_type:fileType,
           file_name:fileName,
           file_path:url,
-          file_size:fileSize
+          file_size:fileSize,
+          purpose:purpose
         });
         return result;
       }

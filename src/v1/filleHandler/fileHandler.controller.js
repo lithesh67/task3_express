@@ -47,16 +47,16 @@ module.exports.getUrl=async(req,res,next)=>{
 }
 
 module.exports.uploadFile=async(req,res,next)=>{
-    const {fileName,url,fileType,fileSize}=req.body;
+    const {fileName,url,fileType,fileSize,purpose}=req.body;
     const {error}=uploadFileSchema.validate({
-        fileName,url,fileType,fileSize
-    })
+        fileName,url,fileType,fileSize,purpose
+    });
     if(error){
         return res.status(400).json({message: error.details[0].message});  
     }
     try{
       const userid=req.userid;
-      const result=await fileService.uploadFile(fileName,url,fileType,fileSize,userid);
+      const result=await fileService.uploadFile(fileName,url,fileType,fileSize,userid,purpose);
       res.status(200).json({message:"uploaded the file",bool:true});
     }
     catch(err){
@@ -80,3 +80,5 @@ module.exports.productImage=async(req,res,next)=>{
        next(err);
     }
 }
+
+

@@ -14,7 +14,8 @@ module.exports.uploadFileSchema=joi.object({
     fileName:joi.string().required(),
     url:joi.string().required(),
     fileType:joi.string().required(),
-    fileSize:joi.alternatives().try(joi.number().integer(),joi.string()).required()
+    fileSize:joi.alternatives().try(joi.number().integer(),joi.string()).required(),
+    purpose:joi.string().optional()
 });
 
 module.exports.productImageSchema=joi.object({

@@ -22,9 +22,9 @@ module.exports=class fileService{
         }
     }
 
-    static async uploadFile(fileName,url,fileType,fileSize,userid){
+    static async uploadFile(fileName,url,fileType,fileSize,userid,purpose){
         try{
-            return await fileQueries.uploadFile(fileName,url,fileType,fileSize,userid);
+            return await fileQueries.uploadFile(fileName,url,fileType,fileSize,userid,purpose);
         }
         catch(err){
             throw err;

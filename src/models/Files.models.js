@@ -20,7 +20,7 @@ class Files extends Model{
                 user_id:{type:'integer'},
                 file_type:{type:'string'},
                 file_path:{type:'string'},
-                file_size:{type:['string','number'] },
+                file_size:{type:['string'] },
                 created_at: { type: 'string', format: 'date-time' },
                 updated_at: { type: 'string', format: 'date-time' }
 

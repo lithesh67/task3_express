@@ -11,7 +11,9 @@ app.use(cors({origin:"http://localhost:4200",exposedHeaders:['Authorization']}))
 app.use(express.json());
 
 const swaggerSpec=require('./src/utils/swagger_specs');
+const { processExcel } = require('./src/v1/scheduled/scheduled.controller');
 
+processExcel();
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec));
 app.use('/api',require('./src/v1/v1Routes'));
 
