@@ -51,8 +51,8 @@ module.exports= class scheduledService{
         let count=0;
         let errors="";
         for(let col of colHeadings){
-           if(requiredHeadings[col]){
-              count+=1
+            if(requiredHeadings[col]==0){
+              count+=1;
            }
         }
         if(count>6){
@@ -89,31 +89,59 @@ module.exports= class scheduledService{
         }
     }
 
-    static async validateRows(jsonSheet,sheetName){
+    static async validateAndInsert(jsonRow,objCategories,objVendors){
         try{
-           let flag=0;
-           for(let j=0;j<jsonSheet.length;j++){
-             let {product_name,category,vendors,quantity_in_stock,unit_price,measure}=jsonSheet[j];
-             const {error}=excelRowSchema.validate({product_name,category,vendors,quantity_in_stock,unit_price,measure},{abortEarly:false});
-             if(error){
-                jsonSheet[j]['errors']=error;
-                flag=1;
+           let vendors=jsonRow['vendors'].split(',');
+           let errors='';
+           for(let vendor of vendors){
+             if(objVendors[vendor]){
+                
              }
            }
-           if(flag==0){
-            return;
-           }
-            const newSheet=xlsx.utils.json_to_sheet(jsonSheet);
-            xlsx.utils.book_append_sheet(newWorkbook,newSheet,sheetName);
-            const buffer=xlsx.write(newWorkbook,{type:'buffer',bookType:'xlsx'});
-            const result=await uploadWorkbookToAWS(buffer,file_data[0].file_name);  
-            await storeTheErrorUrl(result.Location,file_data[0].file_id);  
-            console.log("stored");
-            console.log(result);
+        
         }
         catch(err){
             throw err;
         }
+    }
+
+    static async validateRows(jsonSheet,sheetName,objCategories,objVendors){
+        try{
+           let newJsonSheet=[];
+           for(let j=0;j<jsonSheet.length;j++){
+             let {product_name,category,vendors,quantity_in_stock,unit_price,measure}=jsonSheet[j];
+             const {error}=excelRowSchema.validate({product_name,category,vendors,quantity_in_stock,unit_price,measure},{abortEarly:false});
+             if(error){
+                jsonSheet[j]['error']=error;
+                newJsonSheet.push(jsonSheet[j]);
+                continue;
+             }
+             await validateAndInsert(jsonSheet[j],objCategories,objVendors);
+           }
+            // const newSheet=xlsx.utils.json_to_sheet(jsonSheet);
+            // xlsx.utils.book_append_sheet(newWorkbook,newSheet,sheetName);
+            // const buffer=xlsx.write(newWorkbook,{type:'buffer',bookType:'xlsx'});
+            // const result=await uploadWorkbookToAWS(buffer,file_data[0].file_name);  
+            // await storeTheErrorUrl(result.Location,file_data[0].file_id);  
+            // console.log("stored");
+            // console.log(result);
+        } 
+        catch(err){
+            throw err;
+        }
+    }
+
+    static  transform(categories,vendors){
+       let objCategories=categories.reduce((acc,curr)=>{
+          acc[curr.category.toLowerCase()]=curr.category_id;
+          return acc;
+       },{});
+
+       let objVendors=vendors.reduce((acc,curr)=>{
+          acc[curr.vendor_name.toLowerCase()]=curr.vendor_id;
+          return acc;
+       },{});
+       return {objCategories,objVendors};
     }
 
 }

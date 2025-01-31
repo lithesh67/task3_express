@@ -1,5 +1,6 @@
 const xlsx=require('xlsx');
 const scheduledService = require('./scheduled.service');
+const { getCategories_vendors } = require('../dashboard/dashboard.queries');
 
 
 
@@ -11,6 +12,9 @@ module.exports.processExcel=async()=>{
      if(file_data.length==0){
         return;
      }
+    const {categories,vendors}=await getCategories_vendors();
+    const {objCategories,objVendors}=scheduledService.transform(categories,vendors);
+
     const file_url=file_data[0].file_path;
     console.log(file_url);
     
@@ -20,7 +24,7 @@ module.exports.processExcel=async()=>{
 
     let newWorkbook=xlsx.utils.book_new();
     for(let i=0;i<jsonSheets.length;i++){
-        let colHeadings=Object.keys(jsonSheets[i]);
+        let colHeadings=Object.keys(jsonSheets[i][0]);
         let jsonSheetName=workbook.SheetNames[i];
         let errors=scheduledService.validateColHeadings(colHeadings);
         if(errors){
@@ -36,7 +40,7 @@ module.exports.processExcel=async()=>{
         }
 
         // if there are no validation errors in col headings
-        await scheduledService.validateRows(jsonSheets[i],jsonSheetName,newWorkbook);
+        await scheduledService.validateRows(jsonSheets[i],jsonSheetName,newWorkbook,objCategories,objVendors);
     }
     
     
