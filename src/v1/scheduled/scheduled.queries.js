@@ -1,4 +1,6 @@
 const Files=require('../../models/Files.models');
+const Products = require('../../models/Products.model');
+const Products_To_Vendors = require('../../models/Products_To_Vendors.models');
 const knex=require('../../mysql/db');
 
 module.exports=class scheduledQueries{
@@ -19,5 +21,30 @@ module.exports=class scheduledQueries{
         catch(err){
             throw err;
         }
+    }
+
+    static async insertValidRows(validRows){
+        const trx=await knex.transaction();
+        try{
+            for(let row of validRows){
+                const insertedProduct=await Products.query(trx).insert({
+                    product_name:row.product_name,
+                    category_id:row.category_id,
+                    quantity_in_stock:row.quantity_in_stock,
+                    measure:row.measure,
+                    unit_price:row.unit_price,
+                });
+                await Products_To_Vendors.query(trx).insert({
+                   product_id:insertedProduct.product_id,
+                   vendor_id:row.vendor_id
+                });
+            }
+            trx.commit();
+        }
+        catch(err){
+            trx.rollback();
+            throw err;
+        }
+
     }
 }

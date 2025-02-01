@@ -1,4 +1,5 @@
 const { s3 } = require("../../aws/s3/s3Files");
+const dashboardService = require("../dashboard/dashboard.service");
 const { uploadImageSchema, getUrlSchema, uploadFileSchema, productImageSchema } = require("./dto/fileHandler.joi");
 const fileService = require("./fileHandler.service");
 
@@ -78,6 +79,17 @@ module.exports.productImage=async(req,res,next)=>{
     }
     catch(err){
        next(err);
+    }
+}
+
+module.exports.importedFiles=async(req,res,next)=>{
+    try{
+       const user_id=req.userid;
+       const result=await fileService.getImportedFiles(user_id);
+       return res.status(200).json({result});
+    }
+    catch(err){
+        next(err);
     }
 }
 

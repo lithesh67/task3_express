@@ -1,6 +1,7 @@
 const express=require('express');
 const app=express();
 const env=require('dotenv').config();
+const cron=require('node-cron');
 const {globalError}=require('./src/middleware/error_handlers/globalError');
 const cors=require('cors');
 const port=process.env.PORT;
@@ -14,6 +15,16 @@ const swaggerSpec=require('./src/utils/swagger_specs');
 const { processExcel } = require('./src/v1/scheduled/scheduled.controller');
 
 processExcel();
+// cron.schedule("*/10 * * * *",()=>{
+//     try{
+//        console.log("Running the cron job");
+//         processExcel();
+//     }
+//     catch(err){
+//         console.log(err);
+//     }
+// })
+
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec));
 app.use('/api',require('./src/v1/v1Routes'));
 

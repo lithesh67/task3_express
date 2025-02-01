@@ -1,6 +1,7 @@
 const { getPreSignedUrl, s3 } = require("../../aws/s3/s3Files");
 const sharp=require('sharp');
 const fileQueries = require("./fileHandler.queries");
+const dashboardQueries = require("../dashboard/dashboard.queries");
 
 module.exports=class fileService{
 
@@ -56,6 +57,15 @@ module.exports=class fileService{
             throw err;
         }
        
+    }
+
+    static async getImportedFiles(user_id){
+        try{
+            return await fileQueries.getImportedFiles(user_id);
+        }
+        catch(err){
+            throw err;
+        }
     }
 
 }

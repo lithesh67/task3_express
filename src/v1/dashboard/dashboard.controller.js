@@ -1,4 +1,3 @@
-const { response } = require("express");
 const dashboardService = require("./dashboard.service");
 const { getProductsSchema, getFilesSchema, userDetailsSchema, deleteProductSchema, addProductSchema } = require("./dto/dashboard.joi");
 

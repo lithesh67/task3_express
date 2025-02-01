@@ -18,12 +18,11 @@ module.exports= class scheduledService{
         try{
           const key_of_url=file_url.split('.com/')[1];
           console.log(key_of_url);
-          console.log(process.env.aws_BUCKET_NAME);
           const params={
             Bucket:process.env.aws_BUCKET_NAME,
             Key:key_of_url
           }
-          const file=await s3.getObject(params).promise();
+          const file=await s3.getObject(params).promise();  
           return file;
         }
         catch(err){
@@ -36,7 +35,7 @@ module.exports= class scheduledService{
             const sheets=[];
             for(let sheetName of workbook.SheetNames){
                 let sheet=workbook.Sheets[sheetName];
-                let jsonData=xlsx.utils.sheet_to_json(sheet);
+                let jsonData=xlsx.utils.sheet_to_json(sheet,{defval:""});
                 sheets.push(jsonData);
             }
             return sheets;
@@ -68,7 +67,7 @@ module.exports= class scheduledService{
         try{
             const params={
                 Bucket:process.env.aws_BUCKET_NAME, 
-                Key: 'errors'+Date.now()+file_name,
+                Key: 'errors'+file_name,
                 Body: buffer
             }
             const result=await s3.upload(params).promise();
@@ -89,42 +88,58 @@ module.exports= class scheduledService{
         }
     }
 
-    static async validateAndInsert(jsonRow,objCategories,objVendors){
+    static async validateAndInsert(jsonRow,objCategories,objVendors,validRows){
         try{
            let vendors=jsonRow['vendors'].split(',');
-           let errors='';
-           for(let vendor of vendors){
-             if(objVendors[vendor]){
-                
-             }
+           let errors="";
+           if(!objCategories[jsonRow.category.toLowerCase()]){
+             errors+="Invalid category for the products. "
+             return errors;
            }
-        
+           const category_id= objCategories[jsonRow.category.toLowerCase()];
+           for(let vendor of vendors){
+             if(!objVendors[vendor.toLowerCase()]){
+               errors+=`vendor '${vendor}' does not exist. `;
+               continue;
+             }
+             let newRow=jsonRow;
+             newRow['category_id']=category_id;
+             newRow['vendor_id']=objVendors[vendor.toLowerCase()];
+             validRows.push(newRow);
+           }
+           return errors;
         }
         catch(err){
             throw err;
         }
     }
 
-    static async validateRows(jsonSheet,sheetName,objCategories,objVendors){
+    static async validateRows(jsonSheet,sheetName,newWorkbook,objCategories,objVendors,validRows){
         try{
            let newJsonSheet=[];
            for(let j=0;j<jsonSheet.length;j++){
+           
              let {product_name,category,vendors,quantity_in_stock,unit_price,measure}=jsonSheet[j];
              const {error}=excelRowSchema.validate({product_name,category,vendors,quantity_in_stock,unit_price,measure},{abortEarly:false});
              if(error){
-                jsonSheet[j]['error']=error;
+                jsonSheet[j]['error']=error.message;
                 newJsonSheet.push(jsonSheet[j]);
                 continue;
              }
-             await validateAndInsert(jsonSheet[j],objCategories,objVendors);
+          
+             const rowErrors=await this.validateAndInsert(jsonSheet[j],objCategories,objVendors,validRows);
+             if(rowErrors!=''){
+                jsonSheet[j]['error']=rowErrors;
+                newJsonSheet.push(jsonSheet[j]);
+             }
            }
-            // const newSheet=xlsx.utils.json_to_sheet(jsonSheet);
-            // xlsx.utils.book_append_sheet(newWorkbook,newSheet,sheetName);
-            // const buffer=xlsx.write(newWorkbook,{type:'buffer',bookType:'xlsx'});
-            // const result=await uploadWorkbookToAWS(buffer,file_data[0].file_name);  
-            // await storeTheErrorUrl(result.Location,file_data[0].file_id);  
-            // console.log("stored");
-            // console.log(result);
+
+           if(newJsonSheet.length==0){
+             return;
+           }
+            const newSheet=xlsx.utils.json_to_sheet(newJsonSheet);
+            xlsx.utils.book_append_sheet(newWorkbook,newSheet,sheetName);
+            
         } 
         catch(err){
             throw err;
