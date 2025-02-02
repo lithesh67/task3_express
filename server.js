@@ -1,5 +1,7 @@
 const express=require('express');
 const app=express();
+const http=require('http');
+const httpServer=http.createServer(app);
 const env=require('dotenv').config();
 const cron=require('node-cron');
 const {globalError}=require('./src/middleware/error_handlers/globalError');
@@ -30,6 +32,6 @@ app.use('/api',require('./src/v1/v1Routes'));
 
 app.use(globalError);
 
-app.listen(port,()=>{
+httpServer.listen(port,()=>{
     console.log(`Server is running on port ${port}`); 
 });

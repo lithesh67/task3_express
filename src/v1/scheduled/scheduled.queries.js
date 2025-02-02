@@ -1,4 +1,6 @@
+const { not } = require('joi');
 const Files=require('../../models/Files.models');
+const Notifications = require('../../models/Notifications.models');
 const Products = require('../../models/Products.model');
 const Products_To_Vendors = require('../../models/Products_To_Vendors.models');
 const knex=require('../../mysql/db');
@@ -34,9 +36,10 @@ module.exports=class scheduledQueries{
                     measure:row.measure,
                     unit_price:row.unit_price,
                 });
+                for(let vendor_id of row.vendors)
                 await Products_To_Vendors.query(trx).insert({
                    product_id:insertedProduct.product_id,
-                   vendor_id:row.vendor_id
+                   vendor_id:vendor_id
                 });
             }
             trx.commit();
@@ -45,6 +48,18 @@ module.exports=class scheduledQueries{
             trx.rollback();
             throw err;
         }
+    }
 
+    static async insertNotification(file_data,message,notification_title){
+        try{
+           await Notifications.query(knex).insert({
+             user_id:file_data[0].user_id,
+             notification_title:notification_title,
+             message:message,
+           })
+        }
+        catch(err){
+            throw err;
+        }
     }
 }

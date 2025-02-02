@@ -2,6 +2,7 @@ const scheduledQueries = require("./scheduled.queries");
 const {s3}=require('../../aws/s3/s3Files');
 const xlsx=require('xlsx');
 const { excelRowSchema } = require("./dto/scheduled.joi");
+const { insert } = require("../../mysql/db");
 
 module.exports= class scheduledService{
     static async getUnprocessedFile(){
@@ -97,15 +98,20 @@ module.exports= class scheduledService{
              return errors;
            }
            const category_id= objCategories[jsonRow.category.toLowerCase()];
+           let newRow=jsonRow;
+           newRow['category_id']=category_id;
+           let validVendors=[];
            for(let vendor of vendors){
-             if(!objVendors[vendor.toLowerCase()]){
+             if(!objVendors[vendor.trim().toLowerCase()]){
                errors+=`vendor '${vendor}' does not exist. `;
                continue;
              }
-             let newRow=jsonRow;
-             newRow['category_id']=category_id;
-             newRow['vendor_id']=objVendors[vendor.toLowerCase()];
-             validRows.push(newRow);
+             validVendors.push(objVendors[vendor.trim().toLowerCase()]);
+            }
+           if(validVendors.length!=0)
+           {
+               newRow['vendors']=validVendors;
+               validRows.push(newRow);
            }
            return errors;
         }
@@ -157,6 +163,25 @@ module.exports= class scheduledService{
           return acc;
        },{});
        return {objCategories,objVendors};
+    }
+
+    static async notifyUser(file_data,newWorkbook,insertedCount){
+       try{
+          let message="";
+          let notification_title="";
+          if(newWorkbook.SheetNames.length!=0){
+            message=`Several products are not created, check the error file, inserted ${insertedCount} rows`;
+            notification_title=`Error processing ${file_data[0].file_name}`;
+          }
+          else{
+            message=`Products inserted successfully, inserted ${insertedCount} rows`;
+            notification_title=`File ${file_data[0].file_name} processed successfully`;
+          }
+          await scheduledQueries.insertNotification(file_data,message,notification_title);
+       }
+       catch(err){
+        throw err;
+       }
     }
 
 }
