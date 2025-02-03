@@ -1,4 +1,3 @@
-const { not } = require('joi');
 const Files=require('../../models/Files.models');
 const Notifications = require('../../models/Notifications.models');
 const Products = require('../../models/Products.model');
@@ -52,11 +51,21 @@ module.exports=class scheduledQueries{
 
     static async insertNotification(file_data,message,notification_title){
         try{
-           await Notifications.query(knex).insert({
+           const insertedNote=await Notifications.query(knex).insert({
              user_id:file_data[0].user_id,
              notification_title:notification_title,
              message:message,
-           })
+           });
+           return insertedNote.id;
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async updateFileStatus(file_data,status){
+        try{
+           await Files.query(knex).patch({status:status}).where('file_id','=',file_data[0].file_id);
         }
         catch(err){
             throw err;

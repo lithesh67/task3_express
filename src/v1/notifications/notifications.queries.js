@@ -12,4 +12,13 @@ module.exports=class notificationQueries{
             throw err;
         }
     }
+
+    static async markRead(notification_id){
+        try{
+            await Notifications.query(knex).patch({is_read:'1'}).where('notification_id','=',notification_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
 }

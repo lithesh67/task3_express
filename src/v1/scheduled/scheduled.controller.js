@@ -1,7 +1,6 @@
 const xlsx=require('xlsx');
 const scheduledService = require('./scheduled.service');
 const { getCategories_vendors } = require('../dashboard/dashboard.queries');
-const scheduledQueries = require('./scheduled.queries');
 
 
 
@@ -10,11 +9,12 @@ const scheduledQueries = require('./scheduled.queries');
 module.exports.processExcel=async()=>{
    try{
      const file_data=await scheduledService.getUnprocessedFile();
-   //   change the status to processing 
      if(file_data.length==0){
         console.log("No file to process");
         return;
      }
+    await scheduledService.updateFileStatus(file_data,'1'); 
+    await scheduledService.emitFileStatus(file_data,"processing");
     const {categories,vendors}=await getCategories_vendors();
     const {objCategories,objVendors}=scheduledService.transform(categories,vendors);
 
@@ -48,15 +48,15 @@ module.exports.processExcel=async()=>{
        console.log(result); 
        
     }
-   //  console.log("valid rows",validRows);
-       await scheduledQueries.insertValidRows(validRows);
-       console.log("inserted");
-       
+    console.log("valid rows",validRows);
+    await scheduledService.insertValidRows(validRows);
+    console.log("inserted");
+    
     await scheduledService.notifyUser(file_data,newWorkbook,validRows.length);
-   //  set the file as processed 
+    await scheduledService.updateFileStatus(file_data,'2');
+    await scheduledService.emitFileStatus(file_data,'processed');
    }
    catch(err){
      console.log(err);
-     
    }
 }

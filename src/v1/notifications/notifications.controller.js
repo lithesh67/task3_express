@@ -10,3 +10,14 @@ module.exports.getNotifications=async(req,res,next)=>{
     next(err);
    }
 }
+
+module.exports.markRead=async(req,res,next)=>{
+  try{
+     const {notification_id}=req.body;
+     await notificationService.markRead(notification_id);
+     return res.status(200).json({message:"Marked as read"});
+  }
+  catch(err){
+    next(err);
+  }
+}

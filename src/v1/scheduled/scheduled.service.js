@@ -3,6 +3,7 @@ const {s3}=require('../../aws/s3/s3Files');
 const xlsx=require('xlsx');
 const { excelRowSchema } = require("./dto/scheduled.joi");
 const { insert } = require("../../mysql/db");
+const { getIO, getSocketId } = require("../../utils/socket");
 
 module.exports= class scheduledService{
     static async getUnprocessedFile(){
@@ -108,7 +109,7 @@ module.exports= class scheduledService{
              }
              validVendors.push(objVendors[vendor.trim().toLowerCase()]);
             }
-           if(validVendors.length!=0)
+           if(validVendors.length==vendors.length)
            {
                newRow['vendors']=validVendors;
                validRows.push(newRow);
@@ -177,11 +178,60 @@ module.exports= class scheduledService{
             message=`Products inserted successfully, inserted ${insertedCount} rows`;
             notification_title=`File ${file_data[0].file_name} processed successfully`;
           }
-          await scheduledQueries.insertNotification(file_data,message,notification_title);
+          const note_id=await scheduledQueries.insertNotification(file_data,message,notification_title);
+          await this.emitNotification(note_id,notification_title,message,file_data);
        }
        catch(err){
         throw err;
        }
+    }
+
+    static async updateFileStatus(file_data,status){
+        try{
+           await scheduledQueries.updateFileStatus(file_data,status);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async emitFileStatus(file_data,status){
+        try{
+           const io=getIO();
+           const socketId=getSocketId(file_data[0].user_id);
+           if(!socketId){
+             return;
+           }
+           io.to(socketId).emit('status',{status,'file_id':file_data[0].file_id});
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async insertValidRows(validRows,file_data){
+        try{
+           await scheduledQueries.insertValidRows(validRows);
+        }
+        catch(err){
+            await this.updateFileStatus(file_data,'99');
+            await this.emitFileStatus(file_data,'Failed');
+            throw err;
+        }
+    }
+
+    static async emitNotification(notification_id,notification_title,message,file_data){
+        try{
+            const io=getIO();
+            const socketId=getSocketId(file_data[0].user_id);
+            if(!socketId){
+                return;
+            }
+            io.to(socketId).emit('notify',{notification_id,notification_title,message,is_read:'0'});
+        }
+        catch(err){
+            throw err;
+        }
     }
 
 }

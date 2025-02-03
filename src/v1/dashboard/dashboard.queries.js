@@ -87,10 +87,13 @@ module.exports=class dashboardQueries{
     static async deleteProduct(product_id){
         const trx=await knex.transaction();
         try{
+            product_id=parseInt(product_id);  
             await Products.query(trx).patch({status:'99'}).where('product_id','=',product_id);
             await Products_To_Vendors.query(trx).patch({status:'99'}).where('product_id','=',product_id);
+            trx.commit();
         }
         catch(err){
+            trx.rollback();
             throw err;
         }
     }

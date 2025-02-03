@@ -11,4 +11,13 @@ module.exports=class notificationService{
         throw err;
        }
     }
+
+    static async markRead(notification_id){
+        try{
+            await notificationQueries.markRead(notification_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
 }

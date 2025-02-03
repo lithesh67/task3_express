@@ -94,6 +94,7 @@ module.exports.deleteProduct=async(req,res,next)=>{
     try{
         await dashboardService.deleteProduct(product_id);
         res.status(200).json({message:"Deleted successfully",bool:true});
+        
     }
     catch(err){
         next(err);
