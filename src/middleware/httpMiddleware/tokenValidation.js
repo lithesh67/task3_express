@@ -8,7 +8,7 @@ function validateAndSend(refresh,req){
     
         const result=jwt.verify(refresh,process.env.SECRET_KEY_REFRESH);
         decrypted_obj=JSON.parse(decrypt(result.enc));
-        const newToken=signToken(decrypted_obj.id,decrypted_obj.username);
+        const newToken=signToken(decrypted_obj.id,decrypted_obj.username,decrypted_obj.role);
         req.userid=decrypted_obj.id;
         req.role=decrypted_obj.role;
         return newToken;

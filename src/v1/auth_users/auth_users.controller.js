@@ -2,7 +2,6 @@ const { ref } = require('joi');
 const { logger } = require('../../middleware/loggers/logger');
 const authService=require('./auth_users.service');
 const { loginUserSchema, registerSchema } = require('./dto/auth_users.joi');
-const { signToken } = require('../../utils/signToken.utils');
 
 module.exports.loginUser=async(req,res,next)=>{
     const {identifier,password}=req.body;
