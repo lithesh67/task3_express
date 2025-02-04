@@ -214,8 +214,8 @@ module.exports= class scheduledService{
            await scheduledQueries.insertValidRows(validRows);
         }
         catch(err){
-            await this.updateFileStatus(file_data,'99');
-            await this.emitFileStatus(file_data,'Failed');
+            // await this.updateFileStatus(file_data,'99');
+            // await this.emitFileStatus(file_data,'Failed');
             throw err;
         }
     }

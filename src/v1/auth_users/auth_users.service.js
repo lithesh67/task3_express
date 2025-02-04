@@ -24,13 +24,15 @@ module.exports=class authService{
         try{
             const dbData=await authDB.login(user);
             if(dbData && await bcrypt.compare(password,dbData.password)){
-                const token=signToken(dbData.id,dbData.username);
-                const refresh=signRefresh(dbData.id,dbData.username);
+                const token=signToken(dbData.id,dbData.username,dbData.role);
+                const refresh=signRefresh(dbData.id,dbData.username,dbData.role);
                 await authDB.storeRefresh(user,refresh);
                 const username=dbData.username;
                 const email=dbData.email;
                 const id=dbData.id;
-                return {token,refresh,username,email,id};
+                const role=dbData.role;
+                const enc_role=encrypt({role});
+                return {token,refresh,username,email,id,enc_role};
             }
             else{
                 return null;

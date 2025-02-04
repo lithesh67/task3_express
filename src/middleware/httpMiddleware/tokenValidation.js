@@ -10,6 +10,7 @@ function validateAndSend(refresh,req){
         decrypted_obj=JSON.parse(decrypt(result.enc));
         const newToken=signToken(decrypted_obj.id,decrypted_obj.username);
         req.userid=decrypted_obj.id;
+        req.role=decrypted_obj.role;
         return newToken;
     }
     catch(err){
@@ -57,6 +58,7 @@ const validateToken=(req,res,next)=>{
             else{                
                 const decrypted_obj=JSON.parse(decrypt(decoded.enc));
                 req.userid=decrypted_obj.id;
+                req.role=decrypted_obj.role;
                 next();
             }
         });

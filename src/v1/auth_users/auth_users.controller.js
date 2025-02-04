@@ -18,9 +18,9 @@ module.exports.loginUser=async(req,res,next)=>{
         if(result===null){
             return res.status(401).json({message:"Invalid credentials",bool:false});
         }
-        const {token,refresh,username,email,id}=result;
+        const {token,refresh,username,email,id,enc_role}=result;
         logger.info({message:"User logged in"})
-        return res.status(200).json({message:"Login successful",bool:true,token,refresh,username,email,id});
+        return res.status(200).json({message:"Login successful",bool:true,token,refresh,username,email,id,enc_role});
     }
     catch(err){
         next(err);

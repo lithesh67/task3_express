@@ -54,7 +54,7 @@ module.exports=class fileQueries{
 
     static async getImportedFiles(user_id){
       try{
-         return await Files.query(knex).select(['file_name','status','error_file','file_id']).where('user_id','=',user_id)
+         return await Files.query(knex).select(['file_name','status','error_file','file_id','created_at']).where('user_id','=',user_id)
                                        .where('purpose','=','1');
       }
       catch(err){

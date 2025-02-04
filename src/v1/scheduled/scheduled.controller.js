@@ -51,7 +51,7 @@ module.exports.processExcel=async()=>{
     console.log("valid rows",validRows);
     await scheduledService.insertValidRows(validRows);
     console.log("inserted");
-    
+   
     await scheduledService.notifyUser(file_data,newWorkbook,validRows.length);
     await scheduledService.updateFileStatus(file_data,'2');
     await scheduledService.emitFileStatus(file_data,'processed');

@@ -47,8 +47,11 @@ module.exports.userDetails=async(req,res,next)=>{
     }
     try{
         let result=await dashboardService.userDetails(userid);
-        result=process.env.aws_domain+result[0].thumbnail;
-        res.status(200).json({profile_pic:result});
+        let profile_url="";
+        if(result[0].thumbnail){
+            profile_url=process.env.aws_domain+result[0].thumbnail;
+        }
+        return res.status(200).json({profile_pic:profile_url});
         
     }
     catch(err){

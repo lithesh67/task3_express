@@ -3,6 +3,7 @@ const Notifications = require('../../models/Notifications.models');
 const Products = require('../../models/Products.model');
 const Products_To_Vendors = require('../../models/Products_To_Vendors.models');
 const knex=require('../../mysql/db');
+const { updateQuantity } = require('../dashboard/dashboard.queries');
 
 module.exports=class scheduledQueries{
     static async getUnprocessedFile(){
@@ -27,21 +28,26 @@ module.exports=class scheduledQueries{
     static async insertValidRows(validRows){
         const trx=await knex.transaction();
         try{
-            for(let row of validRows){
-                const insertedProduct=await Products.query(trx).insert({
-                    product_name:row.product_name,
-                    category_id:row.category_id,
-                    quantity_in_stock:row.quantity_in_stock,
-                    measure:row.measure,
-                    unit_price:row.unit_price,
-                });
-                for(let vendor_id of row.vendors)
-                await Products_To_Vendors.query(trx).insert({
-                   product_id:insertedProduct.product_id,
-                   vendor_id:vendor_id
-                });
+           const insertedProducts=await trx.batchInsert('products',validRows.map((row)=>{
+            return {
+              product_name:row.product_name,
+              category_id:row.category_id,
+              quantity_in_stock:row.quantity_in_stock,
+              unit_price:row.unit_price,
+              measure:row.measure,
             }
-            trx.commit();
+           },1000));
+           const firstId=insertedProducts[0];
+           const product_ids=await Products.query(trx).select('product_id').where('product_id','>=',firstId).limit(validRows.length);
+           const latestArray=[];
+           validRows.forEach((row,i) => {
+              const vendors=row.vendors;  
+              for(let vendor_id of vendors){
+                latestArray.push({product_id:product_ids[i],vendor_id});
+              }
+           });
+           await trx.batchInsert('products_to_vendors',latestArray,1000);
+           trx.commit();
         }
         catch(err){
             trx.rollback();
@@ -56,7 +62,7 @@ module.exports=class scheduledQueries{
              notification_title:notification_title,
              message:message,
            });
-           return insertedNote.id;
+           return insertedNote.notification_id;
         }
         catch(err){
             throw err;

@@ -22,15 +22,15 @@ const swaggerSpec=require('./src/utils/swagger_specs');
 const { processExcel } = require('./src/v1/scheduled/scheduled.controller');
 
 // processExcel();
-cron.schedule("*/30 * * * * *",()=>{
-    try{
-       console.log("Running the cron job");
-        processExcel();
-    }
-    catch(err){
-        console.log(err);
-    }
-});
+// cron.schedule("*/30 * * * * *",()=>{
+//     try{
+//        console.log("Running the cron job");
+//         processExcel();
+//     }
+//     catch(err){
+//         console.log(err);
+//     }
+// });
 
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec));
 app.use('/api',require('./src/v1/v1Routes'));
