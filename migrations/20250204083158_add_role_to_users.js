@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up =async function(knex) {
-  const exists=knex.schema.hasTable('users');
+  const exists=await knex.schema.hasTable('users');
   return knex.schema.alterTable('users',(table)=>{
     table.enum('role',['admin','user','manager']).defaultTo('user').notNullable();
   })

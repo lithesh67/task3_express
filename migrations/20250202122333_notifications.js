@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up =async function(knex) {
-   const exists=knex.schema.hasTable('notifications');
+   const exists=await knex.schema.hasTable('notifications');
    if(exists){
     return knex.schema.createTable('notifications',(table)=>{
         table.increments('notification_id').primary();

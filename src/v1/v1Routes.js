@@ -6,6 +6,7 @@ router.use(require('./dashboard/dashboard.routes'));
 router.use(require('./filleHandler/fileHandler.routes'));
 router.use(require('./scheduled/scheduled.routes'));
 router.use(require('./notifications/notifications.routes'));
+router.use(require('./chat/chat.routes'));
 
 module.exports=router;
 

@@ -24,6 +24,10 @@ module.exports.initializeScoket=(httpServer)=>{
             socket.disconnect();
             return;
         }
+
+        socket.on('send_message',({message,userid})=>{
+          io.to(users[userid]).emit('receive_message',{message,sender_id:socketsObj[socket.id]});
+        });
        
         socket.on('disconnect',()=>{
          console.log("user disconnected",socket.id);
