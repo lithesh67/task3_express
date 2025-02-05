@@ -26,4 +26,4 @@ class Messages extends Model{
     }
 }
 
-module.exports=Chats;
+module.exports=Messages;

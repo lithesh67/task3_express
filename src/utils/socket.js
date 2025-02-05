@@ -1,6 +1,7 @@
 const {Server}=require('socket.io');
 const jwt=require('jsonwebtoken');
 const { decrypt } = require('./crypt');
+const { insertMessage } = require('../v1/chat/chat.controller');
 
 let io;
 const users={};
@@ -25,8 +26,9 @@ module.exports.initializeScoket=(httpServer)=>{
             return;
         }
 
-        socket.on('send_message',({message,userid})=>{
-          io.to(users[userid]).emit('receive_message',{message,sender_id:socketsObj[socket.id]});
+        socket.on('send_message',async(data)=>{
+          await insertMessage(data);
+          io.to(users[data.userid]).emit('receive_message',{message:data.message,sender_id:socketsObj[socket.id],'chat_id':data.chat_id});
         });
        
         socket.on('disconnect',()=>{
@@ -36,7 +38,6 @@ module.exports.initializeScoket=(httpServer)=>{
     }
     catch(err){
         console.log(err);
-        
     }
     });
 }
