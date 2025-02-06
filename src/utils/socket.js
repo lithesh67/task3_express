@@ -27,16 +27,16 @@ module.exports.initializeScoket=(httpServer)=>{
         }
         
         socket.on('send_message',async(data)=>{
-          await insertMessage(data);
+          await insertMessage(data.message,data.chat_id,socketsObj[socket.id]);
           io.to(users[data.userid]).emit('receive_message',{message:data.message,sender_id:socketsObj[socket.id],'chat_id':data.chat_id});
         });
 
-
+        socket.on('send_to_group',async(data)=>{
+          await  insertMessage(data.message,data.chat_id,socketsObj[socket.id]);
+          io.to(data.group_name).emit('receive_message',{message:data.message,sender_id:socketsObj[socket.id],'chat_id':data.chat_id});
+        })
        
-        socket.on('disconnect',()=>{
-         console.log("user disconnected",socket.id);
-         delete socketsObj[socket.id];
-        });
+       
 
         socket.on('join_group',async({chat_id,group_name,participants})=>{
             for(let i=0;i<participants.length;i++){
@@ -48,6 +48,11 @@ module.exports.initializeScoket=(httpServer)=>{
             }
            }  
         });
+
+        socket.on('disconnect',()=>{
+            console.log("user disconnected",socket.id);
+            delete socketsObj[socket.id];
+           });
 
 
         

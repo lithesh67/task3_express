@@ -46,9 +46,9 @@ module.exports.getUserChat=async(req,res,next)=>{
     }
 }
 
-module.exports.insertMessage=async(data)=>{
+module.exports.insertMessage=async(message,chat_id,sender_id)=>{
     try{
-       await chatService.insertMessage(data.message,data.userid,data.chat_id);
+       await chatService.insertMessage(message,chat_id,sender_id);
     }
     catch(err){
         console.log(err);
@@ -67,6 +67,15 @@ module.exports.createGroup=async(req,res,next)=>{
         }
         const chat_id=await chatService.createGroup(group_name,participants);
         return res.status(200).json({chat_id:chat_id,creator_id:userid});
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+module.exports.joinGroup=async(req,res,next)=>{
+    try{
+        
     }
     catch(err){
         next(err);

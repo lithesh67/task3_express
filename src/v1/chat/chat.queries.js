@@ -58,9 +58,9 @@ module.exports=class chatQueries{
         }
     }
 
-    static async insertMessage(message,user_id,chat_id){
+    static async insertMessage(message,chat_id,sender_id){
        try{
-         await Messages.query(knex).insert({message:message,sender_id:user_id,chat_id:chat_id});
+         await Messages.query(knex).insert({message:message,sender_id:sender_id,chat_id:chat_id});
        }
        catch(err){
          throw err;

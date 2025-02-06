@@ -40,9 +40,9 @@ module.exports=class chatService{
         }
     }
 
-    static async insertMessage(message,user_id,chat_id){
+    static async insertMessage(message,chat_id,sender_id){
         try{
-            await chatQueries.insertMessage(message,user_id,chat_id);
+            await chatQueries.insertMessage(message,chat_id,sender_id);
         }
         catch(err){
             throw err;
