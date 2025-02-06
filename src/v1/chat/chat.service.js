@@ -13,9 +13,9 @@ module.exports=class chatService{
         }
     }
 
-    static async createChat(userid,receiver_id,){
+    static async createChat(userid,receiver_id,receiver_name){
         try{
-            return await chatQueries.createChat(userid,receiver_id);
+            return await chatQueries.createChat(userid,receiver_id,receiver_name);
         }
         catch(err){
             throw err;
@@ -43,6 +43,28 @@ module.exports=class chatService{
     static async insertMessage(message,user_id,chat_id){
         try{
             await chatQueries.insertMessage(message,user_id,chat_id);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async groupExists(group_name){
+        try{
+            const result=await chatQueries.groupExists(group_name);
+            if(result.length!=0){
+                return true;
+            }
+            return false;
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async createGroup(group_name,participants){
+        try{
+            return await chatQueries.createGroup(group_name,participants);
         }
         catch(err){
             throw err;

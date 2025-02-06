@@ -17,12 +17,14 @@ module.exports=class chatQueries{
         }
     }
 
-    static async createChat(userid,receiver_id){
+    static async createChat(userid,receiver_id,receiver_name){
         const trx=await knex.transaction();
         try{
             const insertedChat=await Chats.query(trx).insert({is_group:'0'});
-            await Chats_users.query(trx).insert({chat_id:insertedChat.chat_id,user_id:userid});
-            await Chats_users.query(trx).insert({chat_id:insertedChat.chat_id,user_id:receiver_id});
+            const senderQuery=await Users.query(trx).select(['username']).where('id','=',userid);
+            const username=senderQuery[0].username;
+            await Chats_users.query(trx).insert({chat_id:insertedChat.chat_id,user_id:userid,chat_name:receiver_name});
+            await Chats_users.query(trx).insert({chat_id:insertedChat.chat_id,user_id:receiver_id,chat_name:username});
             trx.commit();
             return insertedChat.chat_id;
         }
@@ -34,17 +36,11 @@ module.exports=class chatQueries{
 
     static async getExistingChats(userid){
         try{
-           const result=await Chats_users.query(knex).select(['chat_id']).where('user_id','=',userid);
-           for(let i=0;i<result.length;i++){
-             let chat=result[i];
-             let temp=await Chats_users.query(knex).select(['cu.user_id','u.username'])
-                                                         .from('chats_users as cu')
-                                                         .join('users  as u','cu.user_id','u.id')
-                                                         .where('cu.chat_id','=',chat.chat_id)
-                                                         .where('cu.user_id','!=',userid);                             
-             result[i]['user_id']=temp[0].user_id;
-             result[i]['username']=temp[0].username;
-           };
+           const result=await Chats_users.query(knex).select(['u.id as user_id','cu.chat_id','cu.chat_name','c.is_group'])
+                                                     .from('chats_users as cu')
+                                                     .join('chats as c','cu.chat_id','c.chat_id')
+                                                     .leftJoin('users as u','u.username','cu.chat_name')
+                                                     .where('cu.user_id','=',userid);
            return result;
         }
         catch(err){
@@ -69,6 +65,36 @@ module.exports=class chatQueries{
        catch(err){
          throw err;
        }
+    }
+
+    static async groupExists(group_name){
+        try{
+           const result=await Chats.query(knex).select(['group_name']).where('group_name','=',group_name);
+           return result;
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async createGroup(group_name,participants){
+        const trx=await knex.transaction();
+        try{
+           const insertedGroup=await Chats.query(trx).insert({is_group:'1',group_name:group_name});
+           for(let i=0;i<participants.length;i++){
+              await Chats_users.query(trx).insert({
+                chat_id:insertedGroup.chat_id,
+                user_id:participants[i],
+                chat_name:group_name,
+              });
+           }
+           trx.commit();
+           return insertedGroup.chat_id;
+        }
+        catch(err){
+            trx.rollback();
+            throw err;
+        }
     }
 
 }

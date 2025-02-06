@@ -15,8 +15,8 @@ module.exports.getAllUsers=async(req,res,next)=>{
 module.exports.createChat=async(req,res,next)=>{
     try{
         const userid=req.userid;
-        const {receiver_id}=req.body;
-        const chat_id=await chatService.createChat(userid,receiver_id);
+        const {receiver_id,receiver_name}=req.body;
+        const chat_id=await chatService.createChat(userid,receiver_id,receiver_name);
         return res.status(201).json({chat_id});
     }
     catch(err){
@@ -52,5 +52,23 @@ module.exports.insertMessage=async(data)=>{
     }
     catch(err){
         console.log(err);
+    }
+}
+
+module.exports.createGroup=async(req,res,next)=>{
+    try{
+        const {group_name}=req.body;
+        const userid=req.userid;
+        const participants=[];
+        participants.push(userid);
+        const exists=await chatService.groupExists(group_name);
+        if(exists){
+            return res.status(409).json({message:"Group already exists"});
+        }
+        const chat_id=await chatService.createGroup(group_name,participants);
+        return res.status(200).json({chat_id:chat_id,creator_id:userid});
+    }
+    catch(err){
+        next(err);
     }
 }

@@ -25,16 +25,32 @@ module.exports.initializeScoket=(httpServer)=>{
             socket.disconnect();
             return;
         }
-
+        
         socket.on('send_message',async(data)=>{
           await insertMessage(data);
           io.to(users[data.userid]).emit('receive_message',{message:data.message,sender_id:socketsObj[socket.id],'chat_id':data.chat_id});
         });
+
+
        
         socket.on('disconnect',()=>{
          console.log("user disconnected",socket.id);
          delete socketsObj[socket.id];
-       });
+        });
+
+        socket.on('join_group',async({chat_id,group_name,participants})=>{
+            for(let i=0;i<participants.length;i++){
+            let part_socket_id=users[participants[i]];
+            if(part_socket_id){
+                io.sockets.sockets.get(part_socket_id).join(group_name);
+                // io.to(socket.id).emit('added_to_a_group',{message:"user added"});
+                // can notify user later 
+            }
+           }  
+        });
+
+
+        
     }
     catch(err){
         console.log(err);
