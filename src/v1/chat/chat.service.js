@@ -70,5 +70,32 @@ module.exports=class chatService{
             throw err;
         }
     }
+
+    static async joinGroupPersonally(chat_id,group_name,userid){
+        try{
+            return await chatQueries.joinGroupPersonally(chat_id,group_name,userid);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async unjoinedGroups(userid){
+        try{
+            return await chatQueries.unjoinedGroups(userid);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async getGroupsOfUser(userid){
+        try{
+            return await chatQueries.getGroupsOfUser(userid);
+        }
+        catch(err){
+            throw err;
+        }
+    }
 }
 

@@ -8,7 +8,7 @@ router.route('/dashboard').get(validateToken,getProducts);
 router.route('/getFiles').get(validateToken,getFiles);
 router.route('/getUserDetails').get(validateToken,userDetails);
 router.route('/getCategories_vendors').get(validateToken,getCategories_vendors);
-router.route('/addProduct').post(validateToken,authorizeRoles('admin'),addProduct);
+router.route('/addProduct').post(validateToken,authorizeRoles('admin','manager'),addProduct);
 router.route('/deleteProduct').delete(validateToken,authorizeRoles("admin"),deleteProduct);
 router.route('/updateQuantity').patch(validateToken,updateQuantity);
 router.route('/fetchAll').get(validateToken,fetchAll);

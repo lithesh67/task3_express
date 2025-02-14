@@ -67,9 +67,10 @@ module.exports=class authService{
     }
 
     static async sendEmail(email){
-        try{
+        try{  
            const payload=encrypt({email});
            const token=jwt.sign({'enc':payload},process.env.SECRET_KEY_TOKEN,{expiresIn:'10m'});
+           await authDB.storeResetToken(token,email);
            const transporter=nodemailer.createTransport({
              host:'smtp.gmail.com',
              port:587,
@@ -105,6 +106,10 @@ module.exports=class authService{
            const decoded=jwt.verify(token,process.env.SECRET_KEY_TOKEN);
            const decrypted_obj=JSON.parse(decrypt(decoded.enc));
            const email=decrypted_obj.email;
+           const exists=await authDB.checkResetToken(token);
+           if(exists.length==0){
+             throw new Error("Invalid, try generating a new reset link");
+           }
            const hashed_password=await bcrypt.hash(password,10);
            await authDB.resetPassword(email,hashed_password);
         }

@@ -97,4 +97,36 @@ module.exports=class chatQueries{
         }
     }
 
+    static async joinGroupPersonally(chat_id,group_name,user_id){
+       try{
+          await Chats_users.query(knex).insert({chat_id:chat_id,chat_name:group_name,user_id:user_id});
+       }
+       catch(err){
+        throw err;
+       }
+    }
+
+    static async unjoinedGroups(userid){
+        try{
+            const result=await Chats.query(knex).select(['group_name','chat_id',]).where('is_group','=','1')
+                                         .whereNotIn('chat_id',knex('chats_users').select('chat_id').where('user_id','=',userid));
+            return result;
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async getGroupsOfUser(userid){
+        try{
+           const result=await Chats.query(knex).select(['c.group_name']).from('chats as c')
+                                         .join('chats_users as cu','cu.chat_name','c.group_name')
+                                         .where('cu.user_id','=',userid);
+           return result;
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
 }

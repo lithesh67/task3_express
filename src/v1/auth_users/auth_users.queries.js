@@ -58,8 +58,31 @@ module.exports=class authDB{
     }
 
     static async resetPassword(email,hashed_password){
+        const trx=await knex.transaction();
         try{
-           await Users.query(knex).patch({password:hashed_password}).where('email','=',email);
+           await Users.query(trx).patch({reset_token:null}).where('email','=',email);
+           await Users.query(trx).patch({password:hashed_password}).where('email','=',email);
+           await trx.commit();
+        }
+        catch(err){
+            await trx.rollback();
+            throw err;
+        }
+    }
+
+    static async storeResetToken(resetToken,email){
+        try{
+           await Users.query(knex).patch({reset_token:resetToken}).where('email','=',email);
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    static async checkResetToken(token){
+        try{
+            const result=await Users.query(knex).select(['reset_token']).where('reset_token','=',token);
+            return result;
         }
         catch(err){
             throw err;

@@ -73,11 +73,36 @@ module.exports.createGroup=async(req,res,next)=>{
     }
 }
 
-module.exports.joinGroup=async(req,res,next)=>{
+module.exports.joinGroupPersonally=async(req,res,next)=>{
     try{
-        
+       const userid=req.userid;
+       const {chat_id,group_name}=req.body;
+       await chatService.joinGroupPersonally(chat_id,group_name,userid);
+       return res.status(201).json({message:"Joined the group successfully"});
     }
     catch(err){
         next(err);
+    }
+}
+
+module.exports.unjoinedGroups=async(req,res,next)=>{
+    try{
+        const userid=req.userid;
+        const result=await chatService.unjoinedGroups(userid);
+        return res.status(200).json({result});
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+module.exports.getGroupsOfUser=async(userid)=>{
+    try{
+        const result=await chatService.getGroupsOfUser(userid);
+        return result;
+    }
+    catch(err){
+        console.log(err);
+        
     }
 }

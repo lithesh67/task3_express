@@ -1,7 +1,7 @@
 const {Server}=require('socket.io');
 const jwt=require('jsonwebtoken');
 const { decrypt } = require('./crypt');
-const { insertMessage } = require('../v1/chat/chat.controller');
+const { insertMessage, getGroupsOfUser } = require('../v1/chat/chat.controller');
 
 let io;
 const users={};
@@ -11,7 +11,7 @@ module.exports.initializeScoket=(httpServer)=>{
     io=new Server(httpServer,{
         cors:{ origin:'http://localhost:4200'}
     });
-    io.on("connection",(socket)=>{
+    io.on("connection",async(socket)=>{
         try{
         const token=socket.handshake.auth?.token;
         if(token){
@@ -20,6 +20,12 @@ module.exports.initializeScoket=(httpServer)=>{
             users[decrypted_obj.id]=socket.id;
             socketsObj[socket.id]=decrypted_obj.id;
             console.log(`${decrypted_obj.id} connected with ${socket.id}`);
+            const groups=await getGroupsOfUser(decrypted_obj.id);
+            for(let group of groups){
+                console.log(decrypted_obj.id+" joined in "+group.group_name);
+                
+                socket.join(group.group_name);
+            }
         }
         else{
             socket.disconnect();
@@ -33,7 +39,7 @@ module.exports.initializeScoket=(httpServer)=>{
 
         socket.on('send_to_group',async(data)=>{
           await  insertMessage(data.message,data.chat_id,socketsObj[socket.id]);
-          io.to(data.group_name).emit('receive_message',{message:data.message,sender_id:socketsObj[socket.id],'chat_id':data.chat_id});
+          socket.to(data.group_name).emit('receive_message',{message:data.message,sender_id:socketsObj[socket.id],'chat_id':data.chat_id});
         })
        
        
