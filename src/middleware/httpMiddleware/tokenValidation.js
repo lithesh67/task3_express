@@ -59,7 +59,9 @@ const validateToken=(req,res,next)=>{
                 const decrypted_obj=JSON.parse(decrypt(decoded.enc));
                 req.userid=decrypted_obj.id;
                 req.role=decrypted_obj.role;
-                next();
+                next();  
+                console.log("after next()");
+                      
             }
         });
     }
